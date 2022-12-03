@@ -37,7 +37,7 @@
         </config-file>
 
 
-        <preference name="ANDROID_NORDIC_VERSION" default="1.11.0" />
+        <preference name="ANDROID_NORDIC_VERSION" default="2.1.0" />
         <framework src="no.nordicsemi.android:dfu:$ANDROID_NORDIC_VERSION"/>
         <framework src="androidx.lifecycle:lifecycle-extensions:2.2.0"/>
 
@@ -54,6 +54,12 @@
 
         <header-file src="src/ios/DfuUpdate-Bridging-Header.h" />
         <source-file src="src/ios/DfuUpdate.swift"  />
+        <header-file src="src/ios/CDVFile.h" />
+        <source-file src="src/ios/CDVFile.m" />
+        <header-file src="src/ios/CDVLocalFilesystem.h" />
+        <source-file src="src/ios/CDVLocalFilesystem.m" />
+        <header-file src="src/ios/CDVAssetLibraryFilesystem.h" />
+        <source-file src="src/ios/CDVAssetLibraryFilesystem.m" />
 
         <podspec>
             <config>
@@ -65,6 +71,6 @@
         </podspec>
 
         <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
-        <dependency id="cordova-plugin-file" version="^7.0.0" />
+        <!-- <dependency id="cordova-plugin-file" version="^7.0.0" /> -->
     </platform>
 </plugin>

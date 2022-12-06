@@ -1,3 +1,4 @@
+import Cordova
 import iOSDFULibrary
 
 @objc(DfuUpdate) class DfuUpdate : CDVPlugin, CBCentralManagerDelegate, DFUServiceDelegate, DFUProgressDelegate  {
@@ -99,54 +100,64 @@ import iOSDFULibrary
     }
 
     func startUpgrade(deviceId: String, url: URL, packetReceiptNotificationsValue: NSInteger) -> CDVPluginResult {
-        let selectedFirmware = DFUFirmware(urlToZipFile: url)
-
-        if (!(selectedFirmware?.valid ?? true)) {
-            return CDVPluginResult(
-                status: CDVCommandStatus_ERROR,
-                messageAs: "Invalid firmware"
+        do{
+            let selectedFirmware = try DFUFirmware(urlToZipFile: url) as? DFUFirmware
+            
+            if (!(selectedFirmware?.valid ?? true)) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Invalid firmware"
+                )
+            }
+            
+            let deviceUUID = UUID.init(uuidString: deviceId) ?? nil
+            
+            if (deviceUUID == nil) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Address " + deviceId + " is not a valid UUID"
+                )
+            }
+            
+            let peripherals = manager.retrievePeripherals(withIdentifiers: [deviceUUID!])
+            if (peripherals.count < 1) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Device with address " + deviceId + " not found"
+                )
+            }
+            
+            let deviceP = peripherals[0];
+            
+            //let initiator = DFUServiceInitiator(target: deviceP).with(firmware: selectedFirmware!)
+            let initiator = DFUServiceInitiator(queue: DispatchQueue(label: "Other"))
+            
+            initiator.enableUnsafeExperimentalButtonlessServiceInSecureDfu = true
+            initiator.packetReceiptNotificationParameter = UInt16(packetReceiptNotificationsValue)
+            initiator.forceDfu = false
+            initiator.delegate = self
+            initiator.progressDelegate = self
+            
+            //dfuController = initiator.start()!
+            dfuController = initiator.with(firmware: selectedFirmware!).start(target: deviceP)
+            
+            let pluginResult = CDVPluginResult(
+                status: CDVCommandStatus_OK,
+                messageAs: deviceId + ":" + url.absoluteString
             )
+            
+            pluginResult?.setKeepCallbackAs(true)
+            
+            return pluginResult!
         }
-
-        let deviceUUID = UUID.init(uuidString: deviceId) ?? nil
-
-        if (deviceUUID == nil) {
-            return CDVPluginResult(
+        catch let parseError {
+            print("DFU Error \(parseError.localizedDescription)")
+            let pluginResult = CDVPluginResult(
                 status: CDVCommandStatus_ERROR,
-                messageAs: "Address " + deviceId + " is not a valid UUID"
+                messageAs: "DFU Error \(parseError.localizedDescription)"
             )
+            return pluginResult!
         }
-
-        let peripherals = manager.retrievePeripherals(withIdentifiers: [deviceUUID!])
-        if (peripherals.count < 1) {
-            return CDVPluginResult(
-                status: CDVCommandStatus_ERROR,
-                messageAs: "Device with address " + deviceId + " not found"
-            )
-        }
-
-        let deviceP = peripherals[0];
-
-        //let initiator = DFUServiceInitiator(target: deviceP).with(firmware: selectedFirmware!)
-        let initiator = DFUServiceInitiator(queue: DispatchQueue(label: "Other"))
-
-        initiator.enableUnsafeExperimentalButtonlessServiceInSecureDfu = true
-        initiator.packetReceiptNotificationParameter = UInt16(packetReceiptNotificationsValue)
-        initiator.forceDfu = false
-        initiator.delegate = self
-        initiator.progressDelegate = self
-
-        //dfuController = initiator.start()!
-        dfuController = initiator.with(firmware: selectedFirmware!).start(target: deviceP)
-
-        let pluginResult = CDVPluginResult(
-            status: CDVCommandStatus_OK,
-            messageAs: deviceId + ":" + url.absoluteString
-        )
-
-        pluginResult?.setKeepCallbackAs(true)
-
-        return pluginResult!
     }
 
     func dfuStateDidChange(to state: DFUState) {

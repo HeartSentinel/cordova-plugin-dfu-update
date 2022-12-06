@@ -1,6 +1,7 @@
 {
+  "name": "@heartsentinel/cordova-plugin-dfu-update",
   "version": "1.4.2",
-  "name": "cordova-plugin-dfu-update",
+
   "description": "Use Nordic Semiconductor's Device Firmware Update (DFU) service to update a Bluetooth LE device",
   "devDependencies": {
     "@commitlint/config-conventional": "13.2.0",
@@ -25,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EinfachHans/cordova-plugin-dfu-update.git"
+    "url": "git://github.com/heartsentinel/cordova-plugin-dfu-update.git"
   },
   "keywords": [
     "cordova",
@@ -44,7 +45,7 @@
   "main": "./src/ionic/index.js",
   "types": "./src/ionic/index.d.ts",
   "bugs": {
-    "url": "https://github.com/EinfachHans/cordova-plugin-dfu-update/issues"
+    "url": "https://github.com/heartsentinel/cordova-plugin-dfu-update/issues"
   },
-  "homepage": "https://github.com/EinfachHans/cordova-plugin-dfu-update.git"
+  "homepage": "https://github.com/heartsentinel/cordova-plugin-dfu-update.git"
 }

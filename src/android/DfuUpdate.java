@@ -36,7 +36,10 @@ public class DfuUpdate extends CordovaPlugin {
 	private String fileURL;
 	private final String COARSE = Manifest.permission.ACCESS_COARSE_LOCATION;
 	private final String BLUETOOTH = Manifest.permission.BLUETOOTH;
-	private final String [] permissions = { COARSE, BLUETOOTH};
+	private final String BLUETOOTH_CONNECT = Manifest.permission.BLUETOOTH_CONNECT;
+	private final String BLUETOOTH_SCAN = Manifest.permission.BLUETOOTH_SCAN;
+	private final String [] permissions = { COARSE, BLUETOOTH, BLUETOOTH_CONNECT, BLUETOOTH_SCAN};
+
 
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -93,7 +96,12 @@ public class DfuUpdate extends CordovaPlugin {
 	}
 
 	private boolean hasPerms() {
-		return cordova.hasPermission(COARSE) && cordova.hasPermission(BLUETOOTH);
+		if (Build.VERSION.SDK_INT >= 31) {
+			return cordova.hasPermission(COARSE) && cordova.hasPermission(BLUETOOTH_CONNECT) && cordova.hasPermission(BLUETOOTH_SCAN);
+		}
+		else{
+			return cordova.hasPermission(COARSE) && cordova.hasPermission(BLUETOOTH);
+		}
 	}
 
 
@@ -113,7 +121,9 @@ public class DfuUpdate extends CordovaPlugin {
 					.setPacketsReceiptNotificationsEnabled(true)
 					.setPacketsReceiptNotificationsValue(packetReceiptNotificationsValue)
 					.setUnsafeExperimentalButtonlessServiceInSecureDfuEnabled(true)
-					.setDisableNotification(true);
+					.setDisableNotification(true)
+					.setNumberOfRetries(3)
+					;
 			starter.setZip(fileUriStr);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

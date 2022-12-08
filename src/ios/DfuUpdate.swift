@@ -101,9 +101,9 @@ import iOSDFULibrary
 
     func startUpgrade(deviceId: String, url: URL, packetReceiptNotificationsValue: NSInteger) -> CDVPluginResult {
         do{
-            let selectedFirmware = try DFUFirmware(urlToZipFile: url) as? DFUFirmware
+            let selectedFirmware = try DFUFirmware(urlToZipFile: url)
             
-            if (!(selectedFirmware?.valid ?? true)) {
+            if (!selectedFirmware!.valid) {
                 return CDVPluginResult(
                     status: CDVCommandStatus_ERROR,
                     messageAs: "Invalid firmware"

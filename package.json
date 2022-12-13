@@ -1,6 +1,6 @@
 {
   "name": "@heartsentinel/cordova-plugin-dfu-update",
-  "version": "1.4.2",
+  "version": "1.4.3",
 
   "description": "Use Nordic Semiconductor's Device Firmware Update (DFU) service to update a Bluetooth LE device",
   "devDependencies": {
